@@ -12,12 +12,12 @@
           + Note Baru
         </button>
 
-        <ListNotes :propNotes="notes" :propEditNote="editNote"/>
+        <ListNotes />
       </div>
     </div>
 
     <div class="kanan">
-     <FormNotes :propSaveNote="saveNote" :propUpdateNote="updateNote" :propRemoveNote="removeNote" :propDataForm="dataForm"/>
+     <FormNotes />
     </div>
   </div>
 </template>
@@ -25,59 +25,21 @@
 <script>
 import ListNotes from './components/ListNotes.vue'
 import FormNotes from './components/FormNotes.vue'
+import emitter from 'tiny-emitter/instance'
 
 export default {
   name: 'App',
   data: function() {
-            return {
-               dataForm: {},
-               notes : [
-               { 
-                    id: 1,
-                    title: 'zerohack',
-                    description: 'this is simple description'
-               },
-               { 
-                    id: 2,
-                    title: 'Super User',
-                    description: 'this is super user level'
-               }
-               ]
-            }
-        },
+     return {}
+  },
   components: { 
      ListNotes, 
      FormNotes 
   },
   methods: {
      newNote() {
-          this.dataForm = { id: 0, title: '', description: '' }
-     },
-     editNote(id) {
-          this.dataForm = this.notes.find(note => note.id === id);
-     },
-     saveNote(title, description) {
-          let newId = 0;
-
-          if (this.notes.length === 0) {
-               newId = 1;
-          } else {
-               newId = this.notes[this.notes.length - 1].id + 1;
-          }
-          let newNote = { id: newId, 'title': title, 'description': description }
-
-          this.notes.push(newNote);
-          this.editNote(newId);
-     },
-     updateNote(id, title, description) {
-          let noteIndex = this.notes.findIndex(note => note.id === id);
-
-          this.notes[noteIndex].title = title;
-          this.notes[noteIndex].description = description;
-     },
-     removeNote(id) {
-          let noteIndex = this.notes.findIndex(note => note.id === id);
-          this.notes.splice(noteIndex, 1);
+          let dataForm = { id: 0, title: '', description: '' }
+          emitter.emit('emitForm', dataForm);
      }
   }
 }

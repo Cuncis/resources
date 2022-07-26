@@ -1,8 +1,8 @@
 <template>
     <div class="listNotes">
         <ul>
-            <li v-for="(row, index) in propNotes" :key="index">
-            <button class="btn-note" @click="idNote(row.id)">
+            <li v-for="(row, index) in notes" :key="index">
+            <button class="btn-note" @click="editNote(row.id)">
                 <label>{{ row.title }}</label>
                 <span>{{ row.description }}</span>
             </button>
@@ -12,25 +12,67 @@
 </template>
 
 <script type="textjavascript">
+import emitter from 'tiny-emitter/instance'
+
     export default {
         name: 'listNotes',
         data: function() {
             return {
-
+                notes : [
+                    {
+                        id: 1,
+                        title: 'zerohack',
+                        description: 'simple description'
+                    },
+                    {
+                        id: 2,
+                        title: 'Super User',
+                        description: 'simple description from Super User'
+                    }
+                ]
             }
         },
         props: {
-            propNotes: {
-                type: Array
-            },
             propEditNote: {
                 type: Function
             }
         },
         methods: {
-            idNote(id) {
-                this.propEditNote(id);
+            editNote(id) {
+                let dataForm = this.notes.find(note => note.id === id);
+
+                emitter.emit('emitForm', dataForm);
+            },
+            createNewId() {
+                let newId = 0;
+
+                if (this.notes.length === 0) {
+                    newId = 1;
+                } else {
+                    newId = this.notes[this.notes.length - 1].id + 1;
+                }
+
+                return newId;
             }
+        },
+        mounted() {
+            emitter.on('emitRemoveNote', data => {
+                let noteIndex = this.notes.findIndex(note => note.id === data.id);
+                this.notes.splice(noteIndex, 1);
+            });
+            emitter.on('emitUpdateNote', data => {
+                let noteIndex = this.notes.findIndex(note => note.id === data.id);
+
+                this.notes[noteIndex].title = data.title;
+                this.notes[noteIndex].description = data.description;
+            });
+            emitter.on('emitSaveNote', data => {
+                let newId = this.createNewId();
+                let newNote = { id: newId, 'title': data.title, 'description': data.description }
+
+                this.notes.push(newNote);
+                this.editNote(newId);
+            });
         }
     }
 </script>

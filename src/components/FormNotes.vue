@@ -18,22 +18,11 @@
 </template>
 
 <script type="text/javascript">
+import emitter from 'tiny-emitter/instance'
+
     export default {
         name: 'formNotes',
-        props: {
-            propSaveNote: {
-                type: Function
-            },
-            propUpdateNote: {
-                type: Function
-            },
-            propRemoveNote: {
-                type: Function
-            },
-            propDataForm: {
-                type: Object
-            }
-        },
+        props: { },
         data: function() {
             return {
                 id: 0,
@@ -44,14 +33,21 @@
         methods: {
             submitNote(e) {
                 e.preventDefault();
+
+                let data = {
+                    title: this.title,
+                    description: this.description
+                }
                 if (this.id === 0) {
-                    this.propSaveNote(this.title, this.description);
+                    emitter.emit('emitSaveNote', data);
                 } else {
-                    this.propSaveNote(this.id, this.title, this.description);
+                    data.id = this.id
+                    emitter.emit('emitUpdateNote', data);
                 }
             },
             submitRemove() {
-                this.propRemoveNote(this.id);
+                let data = { id: this.id }
+                emitter.emit('emitRemoveNote', data);
                 this.resetInput();
             },
             resetInput() {
@@ -60,12 +56,12 @@
                 this.description = '';
             }
         },
-        watch: {
-            propDataForm: function(note) {
-                this.id = note.id;
-                this.title = note.title;
-                this.description = note.description;
-            }
+        mounted() {
+            emitter.on('emitForm', data => {
+                this.id = data.id;
+                this.title = data.title;
+                this.description = data.description;
+            })
         }
     }
 </script>
