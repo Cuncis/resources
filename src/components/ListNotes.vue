@@ -40,6 +40,7 @@ import emitter from 'tiny-emitter/instance'
         methods: {
             editNote(id) {
                 let dataForm = this.notes.find(note => note.id === id);
+                dataForm.mode = 'update'
 
                 emitter.emit('emitForm', dataForm);
             },
@@ -62,7 +63,7 @@ import emitter from 'tiny-emitter/instance'
             });
             emitter.on('emitUpdateNote', data => {
                 let noteIndex = this.notes.findIndex(note => note.id === data.id);
-
+                
                 this.notes[noteIndex].title = data.title;
                 this.notes[noteIndex].description = data.description;
             });

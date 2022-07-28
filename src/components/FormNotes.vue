@@ -4,7 +4,8 @@
         <form @submit="submitNote">
             <div class="menu">
                 <button type="button" @click="submitRemove" class="bg-danger btn btn-delete">Delete</button>
-                <button type="submit" class="bg-success btn">Save</button>
+                <button type="button" @click="submitSave" v-if="mode == 'save'" class="bg-success btn">Save</button>
+                <button type="button" @click="submitUpdate" v-if="mode == 'update'" class="bg-success btn">Update</button>
             </div>
 
             <div class="content">
@@ -27,23 +28,25 @@ import emitter from 'tiny-emitter/instance'
             return {
                 id: 0,
                 title: '',
-                description: ''
+                description: '',
+                mode: 'save'
             }
         },
         methods: {
-            submitNote(e) {
-                e.preventDefault();
-
+            submitSave() {
                 let data = {
                     title: this.title,
                     description: this.description
                 }
-                if (this.id === 0) {
-                    emitter.emit('emitSaveNote', data);
-                } else {
-                    data.id = this.id
-                    emitter.emit('emitUpdateNote', data);
+                emitter.emit('emitSaveNote', data);
+            },
+            submitUpdate() {
+                let data = {
+                    title: this.title,
+                    description: this.description
                 }
+                data.id = this.id
+                emitter.emit('emitUpdateNote', data);
             },
             submitRemove() {
                 let data = { id: this.id }
@@ -61,6 +64,7 @@ import emitter from 'tiny-emitter/instance'
                 this.id = data.id;
                 this.title = data.title;
                 this.description = data.description;
+                this.mode = data.mode;
             })
         }
     }

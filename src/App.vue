@@ -38,7 +38,7 @@ export default {
   },
   methods: {
      newNote() {
-          let dataForm = { id: 0, title: '', description: '' }
+          let dataForm = { id: 0, title: '', description: '', mode: 'save' }
           emitter.emit('emitForm', dataForm);
      }
   }
