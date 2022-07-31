@@ -19,7 +19,8 @@
 </template>
 
 <script type="text/javascript">
-import emitter from 'tiny-emitter/instance'
+    import emitter from 'tiny-emitter/instance'
+    import axios from 'axios'
 
     export default {
         name: 'formNotes',
@@ -34,11 +35,19 @@ import emitter from 'tiny-emitter/instance'
         },
         methods: {
             submitSave() {
-                let data = {
-                    title: this.title,
-                    description: this.description
-                }
-                emitter.emit('emitSaveNote', data);
+                let params = new URLSearchParams();
+                params.append('title', this.title);
+                params.append('description', this.description);
+
+                axios.post('http://localhost/testing/api.php?f=CREATE', params).then(response => {
+                    let data = {
+                        id: response.data.id,
+                        title: this.title,
+                        description: this.description
+                    }
+
+                    emitter.emit('emitSaveNote', data);
+                });
             },
             submitUpdate() {
                 let data = {

@@ -11,30 +11,15 @@
     </div>
 </template>
 
-<script type="textjavascript">
-import emitter from 'tiny-emitter/instance'
+<script type="text/javascript">
+    import emitter from 'tiny-emitter/instance'
+    import axios from 'axios'
 
     export default {
         name: 'listNotes',
         data: function() {
             return {
-                notes : [
-                    {
-                        id: 1,
-                        title: 'zerohack',
-                        description: 'simple description'
-                    },
-                    {
-                        id: 2,
-                        title: 'Super User',
-                        description: 'simple description from Super User'
-                    }
-                ]
-            }
-        },
-        props: {
-            propEditNote: {
-                type: Function
+                notes : []
             }
         },
         methods: {
@@ -44,19 +29,15 @@ import emitter from 'tiny-emitter/instance'
 
                 emitter.emit('emitForm', dataForm);
             },
-            createNewId() {
-                let newId = 0;
-
-                if (this.notes.length === 0) {
-                    newId = 1;
-                } else {
-                    newId = this.notes[this.notes.length - 1].id + 1;
-                }
-
-                return newId;
+            getAllData() {
+                axios.get('http://localhost/testing/api.php').then(response => {
+                    console.log(response);
+                    this.notes = response.data;
+                })
             }
         },
         mounted() {
+            this.getAllData();
             emitter.on('emitRemoveNote', data => {
                 let noteIndex = this.notes.findIndex(note => note.id === data.id);
                 this.notes.splice(noteIndex, 1);
@@ -68,11 +49,10 @@ import emitter from 'tiny-emitter/instance'
                 this.notes[noteIndex].description = data.description;
             });
             emitter.on('emitSaveNote', data => {
-                let newId = this.createNewId();
-                let newNote = { id: newId, 'title': data.title, 'description': data.description }
+                let newNote = { id: data.id, 'title': data.title, 'description': data.description }
 
-                this.notes.push(newNote);
-                this.editNote(newId);
+                this.notes.unshift(newNote);
+                this.editNote(data.id);
             });
         }
     }
