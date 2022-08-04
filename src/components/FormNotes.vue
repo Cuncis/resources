@@ -50,17 +50,33 @@
                 });
             },
             submitUpdate() {
-                let data = {
-                    title: this.title,
-                    description: this.description
-                }
-                data.id = this.id
-                emitter.emit('emitUpdateNote', data);
+                let params = new URLSearchParams();
+                params.append('id', this.id);
+                params.append('title', this.title);
+                params.append('description', this.description);
+
+                axios.post('http://localhost/testing/api.php?f=UPDATE', params).then(response => {
+                    let data = {
+                        id: response.data.id,
+                        title: this.title,
+                        description: this.description
+                    }
+
+                    emitter.emit('emitUpdateNote', data);
+                });
             },
             submitRemove() {
-                let data = { id: this.id }
-                emitter.emit('emitRemoveNote', data);
-                this.resetInput();
+                let params = new URLSearchParams();
+                params.append('id', this.id);
+
+                axios.post('http://localhost/testing/api.php?f=DELETE', params).then(response => {
+                    let data = {
+                        id: response.data.id
+                    }
+
+                    emitter.emit('emitRemoveNote', data);
+                    this.resetInput();
+                });
             },
             resetInput() {
                 this.id = 0;
